@@ -1,2 +1,1 @@
-# jstacey.net
 website
