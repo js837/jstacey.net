@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>
+
+function ball(options) {
+    var self = this;
+    var g = 10;
+    this.time = options.time || 0;
+    this.position = options.position || {'x':0, 'y':0}
+    this.startPosition = options.startPosition || {'x':0, 'y':0}
+    this.startAngle = options.startAngle || 45 ;
+    this.startSpeed = options.startSpeed || 100;
+    
+    this.iterate = function(t){
+        this.time += t;
+        this.position = {'x' : this.startPosition.x + this.startSpeed * Math.cos(this.startAngle * Math.PI / 180) * this.time,
+                         'y' : this.startPosition.y + this.startSpeed * Math.sin(this.startAngle * Math.PI / 180) * this.time - 0.5 * g * this.time * this.time }
+    }
+       
+}
+
+$(document).ready(function(){
+  
+  var canvas = document.getElementById("canvas")
+  var ctx = canvas.getContext("2d");
+  var width = $('canvas').width()
+  var height = $('canvas').height()
+  
+  function getAngle(X, Y) {
+     return Math.atan2(Y.y-X.y, -Y.x+X.x)
+  }
+  function getSize(X, Y) {
+     return Math.sqrt(Math.pow(Y.y-X.y, 2) + Math.pow(Y.x-X.x, 2)) / 5;
+  }
+  
+  mousedown = false;
+  $('body').mousedown(function(event){
+      start = {x: event.offsetX, y:event.offsetY};
+	  mousedown = true;
+  });
+  
+  $('body').mousemove(function(event){
+	  if (mousedown) {
+		 current = {x: event.offsetX, y:event.offsetY};
+		 size = getSize(start, current)
+		 angle = getAngle(start, current) 
+		 $('#details').text('angle:' + getAngle(start, current) * 180 / Math.PI + ' ' + 'size:' + getSize(start, current) )
+	  }
+  });
+  
+  $('body').mouseup(function(event){
+	end = {x: event.offsetX, y:event.offsetY};
+	mousedown = false;
+	  console.log({'startAngle':  getAngle(start, current) * 180 / Math.PI, 'startSpeed':getSize(start, current)});
+	  var c = new ball({'startAngle':  getAngle(start, current) * 180 / Math.PI, 'startSpeed':getSize(start, current)});
+
+      timer = setInterval(function(){
+          if (c.position.y < 0){
+            clearTimeout(timer)
+          }
+          //console.log(b.position.x, b.position.y);
+          c.iterate(0.05);
+          ctx.fillRect(c.position.x,height-c.position.y,1,1); // fill in the pixel at (10,10)
+          }, 5); 
+  });
+  
+  
+  $('#start').click(function(){
+      var startAngle = $('#angle').val()
+      var startSpeed = $('#startSpeed').val()
+      
+	  console.log({'startAngle': startAngle, 'startSpeed':startSpeed});
+      var b = new ball({'startAngle': startAngle, 'startSpeed':startSpeed});
+
+      timer = setInterval(function(){
+          if (b.position.y < 0){
+            clearTimeout(timer)
+          }
+          //console.log(b.position.x, b.position.y);
+          b.iterate(0.05);
+          ctx.fillRect(b.position.x,height-b.position.y,1,1); // fill in the pixel at (10,10)
+          }, 5);     
+      
+  })
+  $('#stop').click(function(){
+      clearTimeout(timer)
+  })
+  
+   
+});
+</script>
+
+<canvas id="canvas" width="1000" height="800" style="border:1px solid #000000;">
+	Your browser does not support the HTML5 canvas tag.
+</canvas>
+<div id="details"></div>
+<label><input id="angle" type="range" name="angle" min="10" max="80">angle</label>
+<label><input id="startSpeed" type="range" name="startSpeed" min="10" max="100">startSpeed</label>
+<button id="start">start</button>
+<button id="stop">stop</button>
+
+</body>
+</html>
