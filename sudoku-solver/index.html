@@ -7,57 +7,149 @@
     <title>Jake (js837)</title>
     <meta content="Jake" name="author">
     <meta content="algorithms,programming" name="keywords">
-    <style type="text/css">
-        body {
-            max-width:700px;
-            margin-left:auto;
-            margin-right:auto;
-            background-color: #edebe6;
-            color: #636363;
-            line-height: 27px;
-            font-size: 18px;
-        }
-        a {
-            text-decoration: none;
-            color: #2090C0;
-        }
-        div.header {
-            margin-bottom: 20px;
-            padding: 9px;
-        }
+    <link rel="stylesheet" type="text/css" href="/assets/style.css">
 
-        div.article {
-            margin: 5px;
-            float:left;
-            width: 165px;
-            height: 165px;
-        }
-        img.article-image:hover {
-            border: 6px solid #5A5AFF;
-        }
-        img.article-image {
-            height: 100%;
-            width: 100%;
-            border-radius: 8%;
-            border: 6px solid rgba(255, 255, 255, 0);
-        }
-    </style>
 </head>
 <body>
 
 
-    <div class="header">
-        Sudoku Solver
-    </div>
+<div class="header">
+    Sudoku Solver
+</div>
 
-    <div class="container">
+<div class="container">
+
+<p>
+We present a sudoku solver using a simple stack, written in Python. Although
+it's easy to use recursion - Python's recursive limit is not high
+(but high enough for this problem) and is also inefficient.
+All recursive functions can be rewritten using a stack.
+</p>
+
+<p>
+First let's define a SudokuPuzzle class. The sukoku puzzle is a grid of of 9 X 9 squares.
+We'll represent this as an array of length 81.
+Our aim is to complete the solve method:
 <pre class="prettyprint lang-python">
-def func():
-    print 'a'
+class SudokuPuzzle(object):
+    def __init__(self, grid, empty_spaces):
+        self.grid = grid
+        self.empty_spaces = empty_spaces # Num. of blank sqaures
+    def solve(self):
+        pass
 </pre>
-    </div>
+</p>
 
-    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+<p>
+First let's implement a get_moves() function: get_moves(i). For a given
+square, i, in the grid, get_moves(i) finds the possible values
+from [1,2,3,4,5,6,7,8,9] using simple elimination of the row, column and block.
+
+We use a bit-map to cross-off values as we find them. The hard work
+is really just some fiddly indices.
+
+<pre class="prettyprint lang-python">
+def get_moves(self, i):
+    """
+    For a given square, i, in the grid, find possible values
+    """
+    moves = [1] * 9  # Zero-indexed bit-map of possible values
+
+    row_start = (i//9)*9
+    col_start = i % 9
+    block_start = (row_start // (3*9)) * (3*9) + (((col_start // 3)*3) % 9)
+
+    for j in range(9):
+        row_i = row_start + j
+        col_i = col_start + (j*9)
+        block_i = block_start + (j//3)*9 + (j%3)
+
+        for square_i in (row_i, col_i, block_i):
+            if self.grid[square_i] != 0:
+                moves[self.grid[square_i]-1] = 0 # -1 because of zero-index
+
+    return [(k + 1) for k, value in enumerate(moves) if value == 1]
+</pre>
+</p>
+
+<p>
+We can now convert these moves to SudokuBoard objects. This will come in handy later.
+<pre class="prettyprint lang-python">
+def get_puzzles(self, i, moves):
+    """
+    Convert list of possible values for a square i into a list of
+    SudokuPuzzle instances.
+    """
+    puzzles = []
+    for move in moves:
+        grid = [o for o in self.grid]
+        grid[i] = move
+        puzzles.append(SudokuPuzzle(grid, self.empty_spaces-1))
+    return puzzles
+</pre>
+</p>
+
+
+<p>
+Let's now define a function that generates the child puzzles of a given sudoku puzzle.
+These are boards that have one more square filled in. Given we could choose many different
+squares to fill in the children from, we choose the one with the least possible values.
+This means our search tree is less wide.
+We simply use the two functions what we wrote earlier.
+<pre class="prettyprint lang-python">
+def get_children(self):
+    """
+    Pick the child puzzle with least possible moves.
+    """
+    moves, best_i = [], -1
+    for i, value in enumerate(self.grid):
+        if value != 0:
+            continue
+
+        new_moves = self.get_moves(i)
+
+        # Shortcut if only 0 or 1 moves
+        if len(new_moves) <= 1:
+            return self.get_puzzles(i, new_moves)
+
+        # Pick the square i with the least # of moves
+        if len(moves) == 0 or len(new_moves) < len(moves):
+            moves, best_i = new_moves, i
+
+    return self.get_puzzles(best_i, moves)
+</pre>
+</p>
+
+
+<p>
+And that's nearly it. All that remains is to complete the solve function.
+i.e. fill in the children until the board is full.
+<pre class="prettyprint lang-python">
+def solve(self):
+    """
+    Solve the puzzle, using a stack.
+    """
+    puzzle_stack = self.get_children()
+    while puzzle_stack:
+        puzzle = puzzle_stack.pop()
+        for child_puzzle in puzzle.get_children():
+            if child_puzzle.empty_spaces == 0:
+                return child_puzzle
+            puzzle_stack.append(child_puzzle)
+
+    raise InvalidSudoku()
+</pre>
+</p>
+
+
+<p>
+Full code <a href="sudoku.py">here</a>.
+</p>
+
+
+</div>
+
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
 
 </body>
 </html>
