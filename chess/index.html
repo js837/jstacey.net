@@ -1,11 +1,44 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Jake (js837)</title>
+    <meta charset="UTF-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width,initial-scale=1" name="viewport">
+    <title>Jake (js837)</title>
+    <meta content="Jake" name="author">
+    <meta content="algorithms,programming" name="keywords">
+    <link rel="stylesheet" type="text/css" href="/assets/style.css">
+</head>
 <body>
-<iframe src="http://js837.pythonanywhere.com" style="position:fixed; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;">
+
+
+<div class="header">
+    Chess AI (beta)
+</div>
+
+
+<p>
+I've started work on a chess AI. It's based around the minimax algorithm
+(with alpha-beta improvement).
+</p>
+
+<p>
+Code here on <a href="https://github.com/js837/chess/">github</a>.
+</p>
+
+<p>
+To save on CPU cycles this version only looks at depth 1, so isn't very good.
+You can explore the board tree using the tree viewer at the bottom. This
+shows the evaluation function value of each board position used in minimax.
+</p>
+
+
+
+<div>
+<iframe src="http://js837.pythonanywhere.com" frameBorder="0" style="width: 100%; height: 1000px">
   Your browser doesn't support IFrames
 </iframe>
+</div>
+
 </body>
 </html>

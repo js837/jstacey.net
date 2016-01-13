@@ -1,12 +1,12 @@
-import operator
-import time
 from multiprocessing import Pool
+import time
 
 
 class InvalidSudoku(Exception): pass
 
 
 class SudokuPuzzle(object):
+
     def __init__(self, grid, empty_spaces=None):
         """
         grid: list, length 9 to represent grid
@@ -23,20 +23,18 @@ class SudokuPuzzle(object):
         """
         moves = [1] * 9  # Zero-indexed bit-map of possible values
 
-        row_start = (i // 9) * 9
+        row_start = (i//9)*9
         col_start = i % 9
-        block_start = (row_start // (3 * 9)) * (3 * 9) + (
-        ((col_start // 3) * 3) % 9)
+        block_start = (row_start // (3*9)) * (3*9) + (((col_start // 3)*3) % 9)
 
         for j in range(9):
             row_i = row_start + j
-            col_i = col_start + (j * 9)
-            block_i = block_start + (j // 3) * 9 + (j % 3)
+            col_i = col_start + (j*9)
+            block_i = block_start + (j//3)*9 + (j%3)
 
             for square_i in (row_i, col_i, block_i):
                 if self.grid[square_i] != 0:
-                    moves[
-                        self.grid[square_i] - 1] = 0  # -1 because of zero-index
+                    moves[self.grid[square_i]-1] = 0 # -1 because of zero-index
 
         return [(k + 1) for k, value in enumerate(moves) if value == 1]
 
@@ -49,7 +47,7 @@ class SudokuPuzzle(object):
         for move in moves:
             grid = [o for o in self.grid]
             grid[i] = move
-            puzzles.append(SudokuPuzzle(grid, self.empty_spaces - 1))
+            puzzles.append(SudokuPuzzle(grid, self.empty_spaces-1))
         return puzzles
 
     def get_children(self):
@@ -88,13 +86,13 @@ class SudokuPuzzle(object):
         raise InvalidSudoku()
 
 
+
 def parse_puzzles(filename):
     puzzles = []
     with open(filename) as f:
-        puzzles_raw = ''.join(
-            [line[:9] for line in f.readlines() if not 'Grid' in line])
-        for i in range(0, len(puzzles_raw), 81):
-            puzzle = SudokuPuzzle([int(o) for o in puzzles_raw[i:(i + 81)]])
+        puzzles_raw = ''.join([line[:9] for line in f.readlines() if not 'Grid' in line])
+        for i in range(0,len(puzzles_raw),81):
+            puzzle = SudokuPuzzle([int(o) for o in puzzles_raw[i:(i+81)]])
             puzzles.append(puzzle)
     return puzzles
 
@@ -104,15 +102,13 @@ def main():
     puzzles = parse_puzzles('p096_sudoku.txt')
 
     pool = Pool(3)
-    solutions = pool.map(operator.attrgetter('solve'), puzzles)
+    solutions = map(lambda o:o.solve(), puzzles)
 
-    top_lefts = [solved.grid[0] * 100 + solved.grid[1] * 10 + solved.grid[2] * 1
-                 for solved in solutions]
+    top_lefts = [solved.grid[0] * 100 + solved.grid[1] * 10 + solved.grid[2] * 1 for solved in solutions]
     print sum(top_lefts)
-
+    
     t1 = time.time()
-    print 'Took {0} secs'.format(t1 - t0)
-
+    print 'Took {0} secs'.format(t1-t0)
 
 if __name__ == '__main__':
     main()
