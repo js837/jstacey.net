@@ -13,23 +13,23 @@
 <body>
 
 
-<div class="header">
+<h1>
     Sorting algorithms
-</div>
+</h1>
 
 
 <p>
 Here is a reference guide of a few of the main efficient sorting
-algorithms. CPython uses Timsort.
+algorithms. CPython uses <a href="//en.wikipedia.org/wiki/Timsort">Timsort</a>.
 </p>
 
 
-<h4>Quick sort</h4>
+<h2>Quick sort</h2>
 <p>
-    best = O(n log n)
-    average = O(n log n)
-    worst = O(n^2)
-    stable = no
+    Best: $O(n \log{n})$<br>
+    Average: $O(n \log{n})$<br>
+    Worst: $O(n^2)$<br>
+    Stable: No<br>
 </p>
 <pre class="prettyprint lang-python">
 def quick_sort(list):
@@ -46,13 +46,15 @@ def quick_sort(list):
 
 
 
-<h4>Merge sort</h4>
+<h2>Merge sort</h2>
+
 <p>
-    best = O(n log n)
-    worst = O(n log n)
-    average = O(n log n)
-    stable = yes
+    Best: $O(n \log{n})$<br>
+    Average: $O(n \log{n})$<br>
+    Worst: $O(n \log{n})$<br>
+    Stable: Yes<br>
 </p>
+
 <pre class="prettyprint lang-python">
 def merge_sort(m):
     if len(m) <= 1:
@@ -88,12 +90,12 @@ def merge(left, right):
 
 
 
-<h4>Heap sort</h4>
+<h2>Heap sort</h2>
 <p>
-    best = O(n log n)
-    average = O(n log n)
-    worst = O(n log n)
-    stable = no
+    Best: $O(n \log{n})$<br>
+    Average: $O(n \log{n})$<br>
+    Worst: $O(n \log{n})$<br>
+    Stable: No<br>
 </p>
 <pre class="prettyprint lang-python">
 def heap_sort(lst):
@@ -123,12 +125,13 @@ def siftdown(lst, start, end):
 
 
 
-<h4>Bogosort</h4>
+<h2>Bogosort</h2>
+
 <p>
-    best = O(n)
-    average = O((n+1)!)
-    worst = Inf
-    stable = no
+    Best: $O(n)$<br>
+    Average: $O((n+1)!)$<br>
+    Worst: $\infty$<br>
+    Stable: No<br>
 </p>
 <pre class="prettyprint lang-python">
 import random
@@ -145,8 +148,14 @@ def is_sorted(numbers):
 </pre>
 
 
-
-
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+});
+</script>
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
 
 <script src="/assets/run_prettify.js"></script>
 
