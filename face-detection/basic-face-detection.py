@@ -19,14 +19,14 @@ faces = faceCascade.detectMultiScale(
     scaleFactor=1.3,
     minNeighbors=8,
     minSize=(40, 40),
-    flags = cv2.cv.CV_HAAR_SCALE_IMAGE
+    flags=cv2.cv.CV_HAAR_SCALE_IMAGE
 )
 
 print "Found {0} faces!".format(len(faces))
 
 # Draw a rectangles
 for (x, y, w, h) in faces:
-    cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 10)
+    cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 10)
 
 cv2.imwrite(output_image, image)
 cv2.imshow("Faces found", image)
