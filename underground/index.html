@@ -35,7 +35,7 @@ In [1]:  import networkx as nx
          nx.draw(TubeGraph, pos, node_size=60,font_size=12)
          plt.show()
 </pre>
-<a href="map1.png"><img height="100%" width="100%" src="map1.png"/></a>
+<a href="map1.png"><img class="zoomable" height="100%" width="100%" src="map1.png"/></a>
 </p>
 
 
@@ -136,19 +136,36 @@ In [7]: from math import cos, sin, pi, log
         plt.show()
 </pre>
 
-<a href="map2.png"><img height="100%" width="100%" src="map2.png"/></a>
+<a href="map2.png"><img class="zoomable" height="100%" width="100%" src="map2.png"/></a>
+
+
+<p>
+Full IPython notebook <a href="underground.zip">here</a>.
+</p>
+
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src="/assets/jquery.zoom.min.js"></script>
-<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+<script src="/assets/run_prettify.js"></script>
+
 <script>
 $(document).ready(function(){
   $('img')
     .wrap('<span style="display:inline-block"></span>')
     .css('display', 'block')
     .parent()
-    .zoom();
+    .zoom({
+        onZoomIn:function(){
+            var $img = $(this).parent().find('.zoomable')
+            $(this).parent().css({height:$img.height(), width:$img.width()})
+            $img.fadeTo(100, 0.22)
+        },
+        onZoomOut: function(){
+            var $img = $(this).parent().find('.zoomable')
+            $img.fadeTo(100, 1)
+        }
+    });
 });
 </script>
 </body>
