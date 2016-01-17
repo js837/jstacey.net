@@ -3,7 +3,7 @@
 <head><title>Hex writing app</title>
     <meta charset="utf-8">
     <meta name="author" content="Jake">
-    <link href="styles.css" rel="stylesheet" type="text/css">
+    <link href="/assets/style.css" rel="stylesheet" type="text/css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
     <script type="text/javascript">
@@ -93,8 +93,15 @@
          });    </script>
     <style>
         body {cursor: crosshair;}
-        p {
+
+        canvas {
             position: absolute;
+            top: 0;
+            left:0;
+            z-index: -1;
+        }
+
+        p, h1 {
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             -khtml-user-select: none;
@@ -105,6 +112,9 @@
     </style>
 </head>
 <body>
+
+<h1>Hex drawing</h1>
+
 <p>
     A drawing app to test the HTML5 canvas. Use the mouse to draw. Resize the
     window to clear.
