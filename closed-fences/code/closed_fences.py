@@ -1,4 +1,5 @@
 from fractions import Fraction
+import operator
 
 import math
 
@@ -8,18 +9,17 @@ LEFT, RIGHT = 'LEFT', 'RIGHT'
 INF = 10 ** 10
 
 
+class Point(tuple):
+    def __new__(self, x, y):
+        return tuple.__new__(self, (x, y))
+
+    def __add__(self, other):
+        return Point(self[0] + other[0], self[1] + other[1])
+
+
 def point_on_line(point, line):
     """
     Check if a point is on a line.
-
-    >>> point_on_line((1, 1), ((0, 0), (2, 2)))
-    True
-    >>> point_on_line((1, 1), ((2, 2), (0, 0)))
-    True
-    >>> point_on_line((0, 0), ((2, 2), (0, 0)))
-    True
-    >>> point_on_line((-1, -1), ((3, 3), (0, 0)))
-    False
     """
     line_s, line_e = line
 
@@ -81,7 +81,6 @@ def get_intersect_params(l1, l2):
 
 
 def intersect(l1, l2):
-
     intersect_type, t, s = get_intersect_params(l1, l2)
 
     if intersect_type == INTERSECT_AS_SUBSET:
@@ -95,10 +94,6 @@ def intersect(l1, l2):
             return True
     else:
         raise NotImplementedError
-
-
-
-
 
 
 def is_valid_fence(coord_list):
@@ -142,11 +137,11 @@ def is_valid_fence(coord_list):
         lines.append(new_line)
 
     # Deal with the final line segment separately.
-    final_line = coord_list[0], coord_list[N-1]
+    final_line = coord_list[0], coord_list[N - 1]
 
     # (1) Check that the first and last points are not on the final line
     if point_on_line(coord_list[1], final_line) or \
-       point_on_line(coord_list[-2], final_line):
+            point_on_line(coord_list[-2], final_line):
         return INVALID_FENCE
     # (2) Check the other N-2 lines for intersection
     for line in lines[1:-1]:
@@ -161,7 +156,7 @@ def get_length(line):
     Get the Euclidean length of a line
     """
     start, end = line
-    d2 = (end[0] - start[0])**2 + (end[1] - start[1])**2
+    d2 = (end[0] - start[0]) ** 2 + (end[1] - start[1]) ** 2
     return math.sqrt(d2)
 
 
@@ -188,7 +183,6 @@ def get_side(point, line):
         return -1
     else:
         return 0
-
 
 
 def dot_prod(l1, l2):
@@ -284,8 +278,6 @@ def visible_sides(point, coord_list):
 def main():
     import doctest
     doctest.testmod()
-
-
 
 
 if __name__ == '__main__':
