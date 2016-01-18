@@ -16,7 +16,12 @@ class Point(object):
 
     # We're immutable, so use __new__ not __init__
     def __new__(cls, x, y):
-        cls.x, cls.y = x, y
+        self = super(Point, cls).__new__(cls)
+        self.x, self.y = x, y
+        return self
+
+    def __repr__(self):
+        return 'Point({0}, {1})'.format(self.x, self.y)
 
     def __add__(self, other):
         return Point(self.x + other.x, self.y + other.y)
@@ -32,10 +37,16 @@ class Point(object):
     def __rmul__(self, other):
         return self.__mul__(other)
 
+
 class Line(object):
     # We're immutable, so use __new__ not __init__
     def __new__(cls, start, end):
-        cls.start, cls.end = start, end
+        self = super(Line, cls).__new__(cls)
+        self.start, self.end = start, end
+        return self
+
+    def __repr__(self):
+        return 'Line({0}, {1})'.format(repr(self.start), repr(self.end))
 
     def __contains__(self, point):
         nx = point.x - self.start.x
@@ -49,27 +60,27 @@ class Line(object):
             if nx == dx or nx // dx == 0:
                 return True
         return False
-
-
-def point_on_line(point, line):
-    """
-    Check if a point is on a line.
-    """
-    line_s, line_e = line
-
-    a = point[0] - line_s[0]
-    b = line_e[1] - line_s[1]
-    c = point[1] - line_s[1]
-    d = line_e[0] - line_s[0]
-
-    # First check if lines are not parallel
-    if a * b == c * d:
-
-        # Lines are not parallel, need to decide if they cross
-        if a == d or a // d == 0:
-            return True
-
-    return False
+#
+#
+# def point_on_line(point, line):
+#     """
+#     Check if a point is on a line.
+#     """
+#     line_s, line_e = line
+#
+#     a = point[0] - line_s[0]
+#     b = line_e[1] - line_s[1]
+#     c = point[1] - line_s[1]
+#     d = line_e[0] - line_s[0]
+#
+#     # First check if lines are not parallel
+#     if a * b == c * d:
+#
+#         # Lines are not parallel, need to decide if they cross
+#         if a == d or a // d == 0:
+#             return True
+#
+#     return False
 
 
 def get_intersect_params(l1, l2):
@@ -85,20 +96,20 @@ def get_intersect_params(l1, l2):
             t, s: Fraction
     """
 
-    l1_s, l1_e = l1
-    l2_s, l2_e = l2
+    l1_s, l1_e = l1.start, l1.end
+    l2_s, l2_e = l2.start, l2.end
 
-    a = l1_e[0] - l1_s[0]
-    b = -(l2_e[0] - l2_s[0])
-    c = l1_e[1] - l1_s[1]
-    d = -(l2_e[1] - l2_s[1])
+    a = l1_e.x - l1_s.x
+    b = -1 * (l2_e.x - l2_s.x)
+    c = l1_e.y - l1_s.y
+    d = -1 * (l2_e.y - l2_s.y)
 
-    q = l2_s[0] - l1_s[0]
-    r = l2_s[1] - l1_s[1]
+    q = l2_s.x - l1_s.x
+    r = l2_s.y - l1_s.y
 
     det = a * d - b * c
     if det == 0:
-        if point_on_line(l2_s, l1) or point_on_line(l2_e, l1):
+        if (l2_s in l1) or (l2_e in l1):
             # Subset
             return INTERSECT_AS_SUBSET, 0, 0
         else:
@@ -131,21 +142,21 @@ def intersect(l1, l2):
 
 
 def is_valid_fence(coord_list):
-    """
-    Check if fence given by coord_list is a valid shape.
-
-    >>> invalid_fence = [(0, 0), (2, 0), (2, 2), (1, -1),]
-    >>> is_valid_fence(invalid_fence) == VALID_FENCE
-    False
-
-    >>> valid_fence = [(0, 0), (1, 0), (1, 1), (0, 1), (0,-1)]
-    >>> is_valid_fence(valid_fence) == VALID_FENCE
-    False
-
-    >>> valid_fence = [(0, 0), (1, 0), (1, 1), (0, 1)]
-    >>> is_valid_fence(valid_fence) == VALID_FENCE
-    True
-    """
+    # """
+    # Check if fence given by coord_list is a valid shape.
+    #
+    # >>> invalid_fence = [(0, 0), (2, 0), (2, 2), (1, -1),]
+    # >>> is_valid_fence(invalid_fence) == VALID_FENCE
+    # False
+    #
+    # >>> valid_fence = [(0, 0), (1, 0), (1, 1), (0, 1), (0,-1)]
+    # >>> is_valid_fence(valid_fence) == VALID_FENCE
+    # False
+    #
+    # >>> valid_fence = [(0, 0), (1, 0), (1, 1), (0, 1)]
+    # >>> is_valid_fence(valid_fence) == VALID_FENCE
+    # True
+    # """
 
     N = len(coord_list)
     if N <= 3:
@@ -185,13 +196,13 @@ def is_valid_fence(coord_list):
     return VALID_FENCE
 
 
+
 def get_length(line):
     """
     Get the Euclidean length of a line
     """
-    start, end = line
-    d2 = (end[0] - start[0]) ** 2 + (end[1] - start[1]) ** 2
-    return math.sqrt(d2)
+    t = line.start - line.end
+    return math.sqrt(t.x**2 + t.y**2)
 
 
 def get_side(point, line):
@@ -202,14 +213,15 @@ def get_side(point, line):
     Output -1, 0, +1 depending on the side of the line
     that the point lies
 
-    >>> get_side((0, 1), ((0, 0), (1, 1))) == get_side((0, 2), ((0, 0), (1, 1)))
+    >>> get_side(Point(0, 1), Line(Point(0, 0), Point(1, 1))) \
+        == get_side(Point(0, 2), Line(Point(0, 0), Point(1, 1)))
     True
 
     """
-    line_s, line_e = line
+    line_s, line_e = line.start, line.end
 
-    d = (line_s[1] - line_e[1]) * (point[0] - line_s[0]) + \
-        (line_e[0] - line_s[0]) * (point[1] - line_s[1])
+    d = (line_s.y- line_e.y) * (point.x - line_s.x) + \
+        (line_e.x - line_s.x) * (point.y - line_s.y)
 
     if d > 0:
         return +1
@@ -223,46 +235,29 @@ def dot_prod(l1, l2):
     """
     Dot product of line1 and line2
     """
-    l1_s, l1_e = l1
-    l2_s, l2_e = l2
-
-    A = (l1_e[0] - l1_s[0], l1_e[1] - l1_s[1])
-    B = (l2_e[0] - l2_s[0], l2_e[1] - l2_s[1])
-
-    return A[0] * B[0] + A[1] * B[1]
+    a = l1.end - l1.start
+    b = l2.end - l2.start
+    return a.x * b.x + a.y * b.y
 
 
 def get_angle(l1, l2):
     return float(dot_prod(l1, l2)) / (get_length(l1) * get_length(l2))
 
 
-def visible_sides(point, coord_list):
+def visible_sides(eye, coord_list):
     """
     Given a point. Determine the fences that are (fully or partially)
     visible from here.
-
-    Test a basic square:
-    >>> visible_sides((1,1), [(0,0),(2,0),(2,2),(0,2)])
-    [True, True, True, True]
-
-    More complex
-    >>> visible_sides((0,-1), [(0,0),(2,0),(2,2),(0,2),(1,1)])
-    [True, False, False, False, False]
-
-    >>> visible_sides((0, 1), [(0,0),(2,0),(2,2),(0,2),(1,1)])
-    [False, False, False, True, True]
-
-    >>> visible_sides((1, -1), [(0,0),(2,0),(1,2)])
-    [True, False, False]
-
     """
     N = len(coord_list)
+    point_list = [Point(*o) for o in coord_list]
 
-    lines = [(coord_list[i], coord_list[(i + 1) % N]) for i in range(N)]
+
+    lines = [Line(point_list[i], point_list[(i + 1) % N]) for i in range(N)]
     visible_counts = [False for _ in range(N)]
 
-    for coord in coord_list:
-        eye_line = point, coord
+    for point in point_list:
+        eye_line = Line(Point(*eye), point)
 
         # Create two groups of lines: right/right of the eye-line
         # Lines which completely intersect the eye-line (0<t<1) are in
@@ -272,7 +267,6 @@ def visible_sides(point, coord_list):
         right = []
 
         for line_i, line in enumerate(lines):
-            line_s, line_e = line
 
             intersect_type, t, s = get_intersect_params(line, eye_line)
             if intersect_type == INTERSECT and s >= 0:
@@ -284,11 +278,11 @@ def visible_sides(point, coord_list):
 
                 else:
                     if t == 0:
-                        side = get_side(line_e, eye_line)
-                        line_angle = get_angle(eye_line, (line_s, line_e))
+                        side = get_side(line.end, eye_line)
+                        line_angle = get_angle(eye_line, Line(line.start, line.end))
                     elif t == 1:
-                        side = get_side(line_s, eye_line)
-                        line_angle = get_angle(eye_line, (line_e, line_s))
+                        side = get_side(line.start, eye_line)
+                        line_angle = get_angle(eye_line, Line(line.end, line.start))
 
                     if side == +1:
                         left.append((line_i, s, line_angle))
@@ -312,6 +306,20 @@ def visible_sides(point, coord_list):
 def main():
     import doctest
     doctest.testmod()
+
+    #Test a basic square:
+    assert visible_sides((1,1), [(0,0),(2,0),(2,2),(0,2)]) ==\
+    [True, True, True, True]
+
+    #More complex
+    assert visible_sides((0,-1), [(0,0),(2,0),(2,2),(0,2),(1,1)]) ==\
+    [True, False, False, False, False]
+
+    assert visible_sides((0, 1), [(0,0),(2,0),(2,2),(0,2),(1,1)]) ==\
+    [False, False, False, True, True]
+
+    assert visible_sides((1, -1), [(0,0),(2,0),(1,2)]) ==\
+    [True, False, False]
 
 
 if __name__ == '__main__':
