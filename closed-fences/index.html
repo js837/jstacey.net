@@ -17,6 +17,12 @@
 <h1>Closed Fences</h1>
 
 
+<p>
+This is originally from the USA Computing Olympiad. The problem,
+"Closed Fences" and nicknamed "fence4", is as follows.
+</p>
+
+
 <h2>Problem</h2>
 
 <p>
@@ -26,23 +32,12 @@ and are listed in counter-clockwise order.
 </p>
 
 <p>Every pair of adjacent vertices defines a side of the fence. Thus
-    {x<sub>i</sub> y<sub>i</sub> x<sub>i+1</sub> y<sub>i+1</sub>} is a side
-    of the fence for all i in (1..N). For our purposes, N+1 = 1, so that
+    {$ x_i y_i \space  x_{i+1} y_{i+1}$} is a side
+    of the fence for all $i$ in (1..N). For our purposes, N+1 = 1, so that
     the first and last vertices making the fence closed.
 
-<p> Here is a typical closed fence and a point x,y:
-<pre>
-
-                         * x3,y3
-                 x5,y5  / \
-    x,y *          *   /   \
-                  / \ /     \
-                 /   *       \
-           x6,y6*   x4,y4     \
-                |              \
-                |               \
-           x1,y1*----------------* x2,y2
-</pre>
+<p> Here is a typical closed fence and a point $(x,y)$:
+<img style='width:100%;' src="images/initial_statement2.png"/>
 
 <p>
     Write a program which will do the following:
