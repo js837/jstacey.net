@@ -74,11 +74,11 @@ class TestIntersectLines(unittest.TestCase):
         self.assertEqual(Line.intersect_extended(l1, l2),
                          (NO_INTERSECT, 0, 0))
 
-    def not_parallel_no_intersect(self):
+    def test_not_parallel_no_intersect(self):
         l1 = Line(Point(0, 0), Point(1, 1))
         l2 = Line(Point(5, 5), Point(-5, 5))
-        self.assertEqual(Line.intersect_extended(l1, l2),
-                         (NO_INTERSECT, 0, 0))
+        intersection_type, t, s = Line.intersect_extended(l1, l2)
+        self.assertTrue(t>1)
 
 
 class TestVisibleLines(unittest.TestCase):
@@ -137,12 +137,12 @@ class TestVisibleLines(unittest.TestCase):
         self._runner(eye, fence, [True, False, False], 'img04', scale, box)
 
     def test_points_left_and_right(self):
-        eye = (6, 4)
+        eye = (6, 5)
         fence = [(0, 0), (10, 0), (10, 8), (0, 8), (0, 4), (2, 6), (4, 4),
                  (4, 6),
                  (8, 6), (8, 2), (4, 2), (2, 4), (0, 2)]
         scale, box = 200, (-5, -5, 2005, 3000)
-        self._runner(eye, fence, [False, False, False, False, False, True, True,
+        self._runner(eye, fence, [False, False, False, False, False, False, True,
                                   True, True, True, True, False, False]
                      , 'img05', scale, box)
 

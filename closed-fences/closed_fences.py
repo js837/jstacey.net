@@ -1,4 +1,6 @@
 from fractions import Fraction
+import math
+import operator
 
 INTERSECT_AS_SUBSET, INTERSECT, NO_INTERSECT = range(3)
 
@@ -24,7 +26,7 @@ class Point(object):
         return Point(self.x - other.x, self.y - other.y)
 
     def __mul__(self, scalar):
-        if isinstance(scalar, (int, Fraction)):
+        if isinstance(scalar, (int, float, long, Fraction)):
             return Point(scalar * self.x, scalar * self.y)
         return NotImplemented
 
@@ -65,6 +67,16 @@ class Line(object):
             (self.end - self.start).x * (point - self.start).y
 
         return cmp(d, 0)  # signum(d)
+
+    @staticmethod
+    def get_angle(l1, l2):
+        # This isn't actually the line-angle but is equivalent for ordering
+        # purposes.
+        dot = Line.dot_prod(l1, l2)
+        dot_sign = cmp(dot, 0)
+        return dot_sign * Fraction(dot**2, Line.dot_prod(l1, l1)
+                                   * Line.dot_prod(l2, l2))
+
 
     @staticmethod
     def intersect_extended(l1, l2):
@@ -131,7 +143,7 @@ def visible_sides(eye, point_list):
 
             intersect_type, t, s = Line.intersect_extended(line, eye_line)
 
-            if intersect_type == INTERSECT and s >= 0:
+            if intersect_type == INTERSECT and s >= 0 and  (0<=t<=1):
 
                 # Case 1: Line completely intersects eye-line
                 if 0 < t < 1:
@@ -141,22 +153,18 @@ def visible_sides(eye, point_list):
 
                 # Case 2: Eye-line touches a corner
                 else:
+                    # t == 0 or t==1
                     if t == 1:
                         line = line.reverse()
 
-                    side = eye_line.get_side(line.end)
-                    dot = Line.dot_prod(eye_line, line)
-                    dot_sign = cmp(dot, 0)
-
-                    # This isn't actually the line-angle but is equivalent
-                    # for ordering purposes.
-                    line_angle = dot_sign * Fraction(dot ** 2,
-                                                     Line.dot_prod(line, line))
+                    side = Line.get_side(eye_line, line.end)
+                    line_angle = Line.get_angle(eye_line, line)
 
                     if side == +1:
                         left.append((s, line_angle, line_i))
                     elif side == -1:
                         right.append((s, line_angle, line_i))
+
 
         # Sort left and right to find what the eye sees first.
         left.sort()
