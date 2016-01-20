@@ -59,8 +59,8 @@ The original problem can be found <a href="fence4.html">here</a>.
 <h2>Algorithm</h2>
 
 <p>
-Problems in coordinate-geometry tend to be fiddly due to a large number of
-corner cases - so let's be careful!
+Problems in coordinate-geometry tend to be fiddly due to the fact there
+are often large number of special cases - so let's be careful!
 
 Consider the eye to be a Laser sweeping around. It is only at points
 that a transition can occur between sides that the laser is hitting.
@@ -72,23 +72,25 @@ points.
 </p>
 
 
-<p>
+<p class="column">
 
 <b>Case of complete intersection:</b>
-(Dotted line is not visible)
 <img src="images/transition_example3.png"/>
+
+
+<p>
 
 <b>Case of partial intersection:</b>
 <img src="images/transition_example2.png"/>
 
-</p>
+
 
 <p>
 This suggests we should consider the left and the right of the laser (eye-line)
 differently. On the LHS of the laser the visible line is the intersection
 closest to the eye, with angle between the line and the laser smallest and
 similarly on the RHS.
-</p>
+
 
 <p>
 In pseudo-code:
@@ -209,7 +211,7 @@ slightly careful.
 </p>
 <pre class="prettyprint lang-python">
 @staticmethod
-def intersect_extended(l1, l2):
+def intersect(l1, l2):
     """
     Given two lines - their intersection type.
     (INTERSECT_AS_SUBSET | INTERSECT | NO_INTERSECT)
@@ -296,7 +298,7 @@ def visible_sides(eye, point_list):
 
         for line_i, line in enumerate(lines):
 
-            intersect_type, t, s = Line.intersect_extended(line, eye_line)
+            intersect_type, t, s = Line.intersect(line, eye_line)
 
             if intersect_type == INTERSECT and s >= 0 and  (0<=t<=1):
 
@@ -343,7 +345,7 @@ Full code available <a href="closed_fences.py">here</a> with tests
 </p>
 
 <p>
-Some more examples of the algorithm below. Eye (blue dot), visible sides (green).
+Some more examples of the algorithm below. Eye (red dot), visible sides (red).
 </p>
 
 <div class="examples">

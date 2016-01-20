@@ -79,7 +79,7 @@ class Line(object):
 
 
     @staticmethod
-    def intersect_extended(l1, l2):
+    def intersect(l1, l2):
         """
         Given two lines - their intersection type.
         (INTERSECT_AS_SUBSET | INTERSECT | NO_INTERSECT)
@@ -141,7 +141,7 @@ def visible_sides(eye, point_list):
 
         for line_i, line in enumerate(lines):
 
-            intersect_type, t, s = Line.intersect_extended(line, eye_line)
+            intersect_type, t, s = Line.intersect(line, eye_line)
 
             if intersect_type == INTERSECT and s >= 0 and  (0<=t<=1):
 
