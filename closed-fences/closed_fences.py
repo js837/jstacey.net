@@ -1,6 +1,4 @@
 from fractions import Fraction
-import math
-import operator
 
 INTERSECT_AS_SUBSET, INTERSECT, NO_INTERSECT = range(3)
 
