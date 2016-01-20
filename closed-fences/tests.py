@@ -137,7 +137,7 @@ class TestVisibleLines(unittest.TestCase):
         self._runner(eye, fence, [True, False, False], 'img04', scale, box)
 
     def test_points_left_and_right(self):
-        eye = (6, 5)
+        eye = (6, 4)
         fence = [(0, 0), (10, 0), (10, 8), (0, 8), (0, 4), (2, 6), (4, 4),
                  (4, 6),
                  (8, 6), (8, 2), (4, 2), (2, 4), (0, 2)]
