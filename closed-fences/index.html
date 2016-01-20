@@ -25,7 +25,7 @@ This is originally from the USA Computing Olympiad. The problem,
 
 <p>
 A closed fence in the plane is a set of non-crossing, connected line
-segments with N corners. The corners or vertices are each distinct
+segments with N corners. The corners are each distinct
 and are listed in counter-clockwise order.
 </p>
 
@@ -38,16 +38,10 @@ and are listed in counter-clockwise order.
 <img style='width:100%;' src="images/initial_statement.png"/>
 
 <p>
-    Write a program which will do the following:
-
-<ul>
-    <li> Test an ordered list of vertices {$ x_i $ ,$y_i$}, $ i $
-        in (1..N) to see if the array is a valid fence.
-
-    <li> Find the set of fence sides that a person (with no height) who is
-        standing in the plane at position $ (x,y) $ can "see" when looking at the
-        fence. The location $ (x,y) $ may fall anywhere not on the fence.
-</ul>
+    Write a program which will do the following to find the set of fence
+    sides that a person (with no height) who is standing in the plane at
+    position $ (x,y) $ can "see" when looking at the fence.
+    The location $ (x,y) $ may fall anywhere not on the fence.
 
 <p>A fence side can be seen if there exists a ray that connects $ (x,y) $
     and any point on the side, and the ray does not intersect any other side
@@ -66,7 +60,7 @@ The original problem can be found <a href="fence4.html">here</a>.
 
 <p>
 Problems in coordinate-geometry tend to be fiddly due to a large number of
-corner cases.
+corner cases - so let's be careful!
 
 Consider the eye to be a Laser sweeping around. It is only at points
 that a transition can occur between sides that the laser is hitting.
@@ -149,7 +143,7 @@ return visible_counts
 <p>
  Let's start by defining Point class with some useful
 helper methods to help us with vector algebra. It's important
-that not to use any floating-point logic at any point since this will
+not to use any floating-point logic at any point since this will
 introduce rounding errors. We use the built-in Fraction class.
 </p>
 
@@ -251,17 +245,35 @@ def intersect_extended(l1, l2):
 
 <p>
 And finally the main logic - this is very similar to the pseudo code.
-Note: we don't actually explictitly compute the angle between the two lines
-since this would (in most cases) involve computing $\arccos{x}$ and also
+Note: we don't actually explicitly compute the angle between the two lines
+since this would involve computing $\arccos{x}$ and also
 computing a square root i.e. $\cos{\theta} = \frac{a \cdot b}{|a||b|}$.
 </p>
 
 <p>
-Instead we use the fact that $\cos{x}$ reverses the order and square both
+Instead we use the fact that $\cos{x}$ reverses the order and then we square both
 sides to avoid the square root.
 </p>
 
 <pre class="prettyprint lang-python">
+def get_angle(l1, l2):
+    # This isn't actually the line-angle but is equivalent for ordering
+    # purposes.
+    dot = Line.dot_prod(l1, l2)
+    dot_sign = cmp(dot, 0)
+    return dot_sign * Fraction(dot**2, Line.dot_prod(l1, l1)
+                               * Line.dot_prod(l2, l2))
+
+def get_side(self, point):
+    """
+    Output -1, 0, +1 depending on the side of the line
+    that the point lies.
+    """
+    d = (self.start - self.end).y * (point - self.start).x + \
+        (self.end - self.start).x * (point - self.start).y
+
+    return cmp(d, 0)  # signum(d)
+
 def visible_sides(eye, point_list):
     """
     Given a point. Determine the fences that are (fully or partially)
@@ -286,7 +298,7 @@ def visible_sides(eye, point_list):
 
             intersect_type, t, s = Line.intersect_extended(line, eye_line)
 
-            if intersect_type == INTERSECT and s >= 0:
+            if intersect_type == INTERSECT and s >= 0 and  (0<=t<=1):
 
                 # Case 1: Line completely intersects eye-line
                 if 0 < t < 1:
@@ -296,22 +308,18 @@ def visible_sides(eye, point_list):
 
                 # Case 2: Eye-line touches a corner
                 else:
+                    # t == 0 or t==1
                     if t == 1:
                         line = line.reverse()
 
-                    side = eye_line.get_side(line.end)
-                    dot = Line.dot_prod(eye_line, line)
-                    dot_sign = cmp(dot, 0)
-
-                    # This isn't actually the line-angle but is equivalent
-                    # for ordering purposes.
-                    line_angle = dot_sign * Fraction(dot ** 2,
-                                                     Line.dot_prod(line, line))
+                    side = Line.get_side(eye_line, line.end)
+                    line_angle = Line.get_angle(eye_line, line)
 
                     if side == +1:
                         left.append((s, line_angle, line_i))
                     elif side == -1:
                         right.append((s, line_angle, line_i))
+
 
         # Sort left and right to find what the eye sees first.
         left.sort()
