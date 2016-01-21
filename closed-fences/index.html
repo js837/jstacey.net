@@ -294,7 +294,7 @@ def visible_sides(eye, point_list):
         eye_line = Line(eye, point)
 
         # Create two groups of lines: right/right of the eye-line
-        # Lines which completely intersect the eye-line (0<t<1) are in
+        # Lines which completely intersect the eye-line (0 < t < 1) are in
         # both groups.
         left = (INF, 0, -1)
         right = (INF, 0, -1)
@@ -311,8 +311,9 @@ def visible_sides(eye, point_list):
                     left = min(left, (s, 0, line_i))
                     right = min(right, (s, 0, line_i))
 
-                # Case 2: Eye-line touches a corner (t == 0 or t==1)
+                # Case 2: Eye-line touches a corner
                 else:
+                    # t == 0 or t==1
                     if t == 1:
                         line = line.reverse()
 
