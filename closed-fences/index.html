@@ -125,7 +125,10 @@ for each point in fence:
 
 
     # Sort LHS and RHS to find what the eye sees first.
-    # i.e. by distance then angle
+    # i.e. by distance then angle.
+
+    # Note: since we only need the minimum - it's sufficient
+    # to store just two values - LHS min and RHS min.
     left.sort()
     right.sort()
 
@@ -146,7 +149,8 @@ return visible_counts
  Let's start by defining Point class with some useful
 helper methods to help us with vector algebra. It's important
 not to use any floating-point logic at any point since this will
-introduce rounding errors. We use the built-in Fraction class.
+introduce rounding errors. We use the built-in Fraction class for
+simplicity.
 </p>
 
 <pre class="prettyprint lang-python">
@@ -292,25 +296,23 @@ def visible_sides(eye, point_list):
         # Create two groups of lines: right/right of the eye-line
         # Lines which completely intersect the eye-line (0<t<1) are in
         # both groups.
-
-        left = []
-        right = []
+        left = (INF, 0, -1)
+        right = (INF, 0, -1)
 
         for line_i, line in enumerate(lines):
 
             intersect_type, t, s = Line.intersect(line, eye_line)
 
-            if intersect_type == INTERSECT and s >= 0 and  (0<=t<=1):
+            if intersect_type == INTERSECT and s >= 0 and (0 <= t <= 1):
 
                 # Case 1: Line completely intersects eye-line
                 if 0 < t < 1:
                     # No angle required because fence does not intersect
-                    left.append((s, 0, line_i))
-                    right.append((s, 0, line_i))
+                    left = min(left, (s, 0, line_i))
+                    right = min(right, (s, 0, line_i))
 
-                # Case 2: Eye-line touches a corner
+                # Case 2: Eye-line touches a corner (t == 0 or t==1)
                 else:
-                    # t == 0 or t==1
                     if t == 1:
                         line = line.reverse()
 
@@ -318,22 +320,15 @@ def visible_sides(eye, point_list):
                     line_angle = Line.get_angle(eye_line, line)
 
                     if side == +1:
-                        left.append((s, line_angle, line_i))
+                        left = min(left, (s, line_angle, line_i))
                     elif side == -1:
-                        right.append((s, line_angle, line_i))
+                        right = min(right, (s, line_angle, line_i))
 
+        if left[0] != INF:
+            visible_counts[left[2]] = True
 
-        # Sort left and right to find what the eye sees first.
-        left.sort()
-        right.sort()
-
-        if left:
-            s, line_angle, line_i = left[0]
-            visible_counts[line_i] = True
-
-        if right:
-            s, line_angle, line_i = right[0]
-            visible_counts[line_i] = True
+        if right[0] != INF:
+            visible_counts[right[2]] = True
 
     return visible_counts
 </pre>

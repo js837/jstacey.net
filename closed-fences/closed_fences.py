@@ -1,6 +1,7 @@
 from fractions import Fraction
 
 INTERSECT_AS_SUBSET, INTERSECT, NO_INTERSECT = range(3)
+INF = float('Inf')
 
 
 class Point(object):
@@ -72,9 +73,8 @@ class Line(object):
         # purposes.
         dot = Line.dot_prod(l1, l2)
         dot_sign = cmp(dot, 0)
-        return dot_sign * Fraction(dot**2, Line.dot_prod(l1, l1)
+        return dot_sign * Fraction(dot ** 2, Line.dot_prod(l1, l1)
                                    * Line.dot_prod(l2, l2))
-
 
     @staticmethod
     def intersect(l1, l2):
@@ -133,21 +133,20 @@ def visible_sides(eye, point_list):
         # Create two groups of lines: right/right of the eye-line
         # Lines which completely intersect the eye-line (0<t<1) are in
         # both groups.
-
-        left = []
-        right = []
+        left = (INF, 0, -1)
+        right = (INF, 0, -1)
 
         for line_i, line in enumerate(lines):
 
             intersect_type, t, s = Line.intersect(line, eye_line)
 
-            if intersect_type == INTERSECT and s >= 0 and  (0<=t<=1):
+            if intersect_type == INTERSECT and s >= 0 and (0 <= t <= 1):
 
                 # Case 1: Line completely intersects eye-line
                 if 0 < t < 1:
                     # No angle required because fence does not intersect
-                    left.append((s, 0, line_i))
-                    right.append((s, 0, line_i))
+                    left = min(left, (s, 0, line_i))
+                    right = min(right, (s, 0, line_i))
 
                 # Case 2: Eye-line touches a corner
                 else:
@@ -159,22 +158,15 @@ def visible_sides(eye, point_list):
                     line_angle = Line.get_angle(eye_line, line)
 
                     if side == +1:
-                        left.append((s, line_angle, line_i))
+                        left = min(left, (s, line_angle, line_i))
                     elif side == -1:
-                        right.append((s, line_angle, line_i))
+                        right = min(right, (s, line_angle, line_i))
 
+        if left[0] != INF:
+            visible_counts[left[2]] = True
 
-        # Sort left and right to find what the eye sees first.
-        left.sort()
-        right.sort()
-
-        if left:
-            s, line_angle, line_i = left[0]
-            visible_counts[line_i] = True
-
-        if right:
-            s, line_angle, line_i = right[0]
-            visible_counts[line_i] = True
+        if right[0] != INF:
+            visible_counts[right[2]] = True
 
     return visible_counts
 
